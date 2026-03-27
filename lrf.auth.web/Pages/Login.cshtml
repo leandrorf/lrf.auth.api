@@ -1,0 +1,39 @@
+@page
+@model lrf.auth.web.Pages.LoginModel
+@{
+    ViewData["Title"] = "Entrar";
+}
+
+<h1 class="mb-3">Entrar</h1>
+
+@if (Model.Profile is not null)
+{
+    <div class="alert alert-success">
+        <p class="mb-1"><strong>Autenticado:</strong> @Model.Profile.Email (@Model.Profile.UserName)</p>
+        <p class="mb-1"><strong>Grupos:</strong> @(Model.Profile.Groups.Count == 0 ? "—" : string.Join(", ", Model.Profile.Groups))</p>
+        <p class="mb-0"><strong>Permissões efetivas:</strong> @(Model.Profile.Permissions.Count == 0 ? "—" : string.Join(", ", Model.Profile.Permissions))</p>
+    </div>
+    <p class="text-muted small">As permissões vêm da união das permissões do usuário e dos grupos aos quais ele pertence.</p>
+    <a class="btn btn-outline-secondary" asp-page="/Login">Voltar ao formulário</a>
+}
+else
+{
+    @if (!string.IsNullOrEmpty(Model.ErrorMessage))
+    {
+        <div class="alert alert-danger">@Model.ErrorMessage</div>
+    }
+
+    <form method="post" class="col-lg-5">
+        <div class="mb-3">
+            <label asp-for="Email" class="form-label"></label>
+            <input asp-for="Email" class="form-control" autocomplete="username" />
+        </div>
+        <div class="mb-3">
+            <label asp-for="Password" class="form-label"></label>
+            <input asp-for="Password" class="form-control" autocomplete="current-password" />
+        </div>
+        <button type="submit" class="btn btn-primary">Entrar</button>
+    </form>
+
+    <p class="mt-3 text-muted small">Desenvolvimento: <code>dev@local.dev</code> / <code>Dev12345!</code>. O token inclui permissões de usuários: <code>users.read</code>, <code>users.create</code> (grupo), <code>users.update</code> e <code>users.delete</code> (diretas). <code>POST /api/auth/register</code> exige <code>users.create</code> e JWT.</p>
+}

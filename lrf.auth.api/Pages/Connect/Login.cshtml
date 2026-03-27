@@ -1,0 +1,26 @@
+@page "/connect/login"
+@model lrf.auth.api.Pages.Connect.LoginModel
+@{
+    ViewData["Title"] = "Entrar no IdP";
+}
+
+<h1>Entrar</h1>
+<p class="text-muted">Autenticação para o fluxo OAuth (sessão neste host).</p>
+
+@if (!string.IsNullOrEmpty(Model.ErrorMessage))
+{
+    <p class="err">@Model.ErrorMessage</p>
+}
+
+<form method="post">
+    <input type="hidden" name="ReturnUrl" value="@Model.ReturnUrl" />
+    <div style="margin-bottom:1rem;">
+        <label asp-for="Email"></label><br />
+        <input asp-for="Email" class="form-control" autocomplete="username" style="width:100%;box-sizing:border-box;padding:.4rem;" />
+    </div>
+    <div style="margin-bottom:1rem;">
+        <label asp-for="Password"></label><br />
+        <input asp-for="Password" type="password" autocomplete="current-password" style="width:100%;box-sizing:border-box;padding:.4rem;" />
+    </div>
+    <button type="submit" style="padding:.5rem 1rem;">Entrar</button>
+</form>

@@ -1,0 +1,19 @@
+@page "/oauth/callback"
+@model lrf.auth.web.Pages.OAuth.CallbackModel
+@{
+    ViewData["Title"] = "Callback OAuth";
+}
+
+<h1>Callback OAuth</h1>
+
+@if (!string.IsNullOrEmpty(Model.ErrorMessage))
+{
+    <p class="text-danger">@Model.ErrorMessage</p>
+}
+else if (!string.IsNullOrEmpty(Model.RawResponse))
+{
+    <p class="text-success">Resposta do token endpoint:</p>
+    <pre style="white-space:pre-wrap;word-break:break-all;background:#f5f5f5;padding:1rem;">@Model.RawResponse</pre>
+}
+
+<p><a asp-page="/Index">Voltar</a></p>
