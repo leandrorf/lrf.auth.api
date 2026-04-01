@@ -1,33 +1,28 @@
 using System.IdentityModel.Tokens.Jwt;
 using System.Security.Claims;
-using System.Text;
 using lrf.auth.api.Domain.Entities;
 using lrf.auth.api.Options;
 using Microsoft.Extensions.Options;
-using Microsoft.IdentityModel.Tokens;
 
 namespace lrf.auth.api.Services;
 
 public sealed class JwtTokenService : IJwtTokenService
 {
     private readonly JwtOptions _options;
-    private readonly SigningCredentials _signingCredentials;
+    private readonly IOidcSigningKeyService _signingKeyService;
     private readonly JwtSecurityTokenHandler _handler = new();
 
-    public JwtTokenService(IOptions<JwtOptions> options)
+    public JwtTokenService(IOptions<JwtOptions> options, IOidcSigningKeyService signingKeyService)
     {
         _options = options.Value;
-        if (string.IsNullOrWhiteSpace(_options.SigningKey) || _options.SigningKey.Length < 32)
-            throw new InvalidOperationException("Jwt:SigningKey deve ter pelo menos 32 caracteres.");
-
-        var key = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(_options.SigningKey));
-        _signingCredentials = new SigningCredentials(key, SecurityAlgorithms.HmacSha256);
+        _signingKeyService = signingKeyService;
     }
 
     public (string Token, int ExpiresInSeconds) CreateAccessToken(
         User user,
         IReadOnlyCollection<string> groups,
         IReadOnlyCollection<string> permissions,
+        IReadOnlyCollection<string>? scopes = null,
         string? oauthClientId = null)
     {
         var now = DateTime.UtcNow;
@@ -46,6 +41,9 @@ public sealed class JwtTokenService : IJwtTokenService
         if (!string.IsNullOrEmpty(oauthClientId))
             claims.Add(new Claim("client_id", oauthClientId));
 
+        foreach (var scope in (scopes ?? Array.Empty<string>()).OrderBy(x => x, StringComparer.Ordinal))
+            claims.Add(new Claim("scope", scope));
+
         foreach (var g in groups.OrderBy(x => x, StringComparer.Ordinal))
             claims.Add(new Claim("group", g));
 
@@ -58,7 +56,7 @@ public sealed class JwtTokenService : IJwtTokenService
             claims: claims,
             notBefore: now,
             expires: expires,
-            signingCredentials: _signingCredentials);
+            signingCredentials: _signingKeyService.SigningCredentials);
 
         return (_handler.WriteToken(token), expiresIn);
     }
@@ -94,7 +92,7 @@ public sealed class JwtTokenService : IJwtTokenService
             claims: claims,
             notBefore: now,
             expires: expires,
-            signingCredentials: _signingCredentials);
+            signingCredentials: _signingKeyService.SigningCredentials);
 
         return (_handler.WriteToken(token), expiresIn);
     }

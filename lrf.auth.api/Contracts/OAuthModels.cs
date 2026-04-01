@@ -33,4 +33,26 @@ public sealed class TokenFormRequest
     public string? client_id { get; set; }
 
     public string? code_verifier { get; set; }
+
+    public string? refresh_token { get; set; }
+}
+
+public sealed class RevokeFormRequest
+{
+    [Required]
+    public string? token { get; set; }
+
+    public string? client_id { get; set; }
+
+    public string? token_type_hint { get; set; }
+}
+
+public sealed class IntrospectFormRequest
+{
+    [Required]
+    public string? token { get; set; }
+
+    public string? client_id { get; set; }
+
+    public string? token_type_hint { get; set; }
 }

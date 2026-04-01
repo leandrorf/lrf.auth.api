@@ -13,6 +13,10 @@ public interface IOAuthConnectService
     Task<OAuthTokenOutcome> ExchangeCodeAsync(
         TokenFormRequest form,
         CancellationToken cancellationToken);
+
+    Task RevokeAsync(RevokeFormRequest form, CancellationToken cancellationToken);
+
+    Task<object> IntrospectAsync(IntrospectFormRequest form, CancellationToken cancellationToken);
 }
 
 public sealed class OAuthAuthorizeOutcome

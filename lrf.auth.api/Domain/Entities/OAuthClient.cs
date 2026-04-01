@@ -5,7 +5,12 @@ public sealed class OAuthClient
 {
     public required string ClientId { get; set; }
 
+    public string DisplayName { get; set; } = "";
+
     public bool RequirePkce { get; set; } = true;
+
+    /// <summary>Scopes permitidos para o cliente, separados por espaço.</summary>
+    public string AllowedScopes { get; set; } = "openid profile";
 
     public ICollection<OAuthClientRedirectUri> RedirectUris { get; set; } = new List<OAuthClientRedirectUri>();
 }

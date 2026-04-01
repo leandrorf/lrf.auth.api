@@ -10,7 +10,13 @@ public static class OAuthClientSeeder
         if (await db.OAuthClients.AnyAsync())
             return;
 
-        var client = new OAuthClient { ClientId = "lrf.auth.web", RequirePkce = true };
+        var client = new OAuthClient
+        {
+            ClientId = "lrf.auth.web",
+            DisplayName = "lrf.auth.web",
+            RequirePkce = true,
+            AllowedScopes = "openid profile email",
+        };
         db.OAuthClients.Add(client);
         db.OAuthClientRedirectUris.AddRange(
             new OAuthClientRedirectUri

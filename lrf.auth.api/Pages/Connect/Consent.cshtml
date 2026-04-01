@@ -1,0 +1,29 @@
+@page "/connect/consent"
+@model lrf.auth.api.Pages.Connect.ConsentModel
+@{
+    ViewData["Title"] = "Consentimento";
+}
+
+<h1>Autorizar cliente</h1>
+
+@if (!string.IsNullOrEmpty(Model.ErrorMessage))
+{
+    <p class="err">@Model.ErrorMessage</p>
+}
+else
+{
+    <p><strong>Cliente:</strong> @Model.ClientDisplayName</p>
+    <p>O aplicativo está solicitando acesso a:</p>
+    <ul>
+        @foreach (var scope in Model.Scopes)
+        {
+            <li><code>@scope</code></li>
+        }
+    </ul>
+
+    <form method="post">
+        <input type="hidden" asp-for="ReturnUrl" />
+        <button type="submit" name="decision" value="approve" style="padding:.5rem 1rem;">Autorizar</button>
+        <button type="submit" name="decision" value="deny" style="padding:.5rem 1rem;">Negar</button>
+    </form>
+}

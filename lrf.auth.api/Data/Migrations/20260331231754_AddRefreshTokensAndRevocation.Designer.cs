@@ -3,6 +3,7 @@ using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using lrf.auth.api.Data;
 
@@ -11,9 +12,11 @@ using lrf.auth.api.Data;
 namespace lrf.auth.api.Data.Migrations
 {
     [DbContext(typeof(AuthDbContext))]
-    partial class AuthDbContextModelSnapshot : ModelSnapshot
+    [Migration("20260331231754_AddRefreshTokensAndRevocation")]
+    partial class AddRefreshTokensAndRevocation
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -128,11 +131,6 @@ namespace lrf.auth.api.Data.Migrations
                         .IsRequired()
                         .HasMaxLength(500)
                         .HasColumnType("varchar(500)");
-
-                    b.Property<string>("DisplayName")
-                        .IsRequired()
-                        .HasMaxLength(200)
-                        .HasColumnType("varchar(200)");
 
                     b.Property<bool>("RequirePkce")
                         .HasColumnType("tinyint(1)");
@@ -275,36 +273,6 @@ namespace lrf.auth.api.Data.Migrations
                     b.HasIndex("GroupId");
 
                     b.ToTable("user_groups", (string)null);
-                });
-
-            modelBuilder.Entity("lrf.auth.api.Domain.Entities.UserOAuthConsent", b =>
-                {
-                    b.Property<Guid>("Id")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("char(36)");
-
-                    b.Property<string>("ClientId")
-                        .IsRequired()
-                        .HasMaxLength(64)
-                        .HasColumnType("varchar(64)");
-
-                    b.Property<DateTime>("CreatedAtUtc")
-                        .HasColumnType("datetime(6)");
-
-                    b.Property<string>("Scope")
-                        .IsRequired()
-                        .HasMaxLength(500)
-                        .HasColumnType("varchar(500)");
-
-                    b.Property<Guid>("UserId")
-                        .HasColumnType("char(36)");
-
-                    b.HasKey("Id");
-
-                    b.HasIndex("UserId", "ClientId", "Scope")
-                        .IsUnique();
-
-                    b.ToTable("user_oauth_consents", (string)null);
                 });
 
             modelBuilder.Entity("lrf.auth.api.Domain.Entities.UserPermission", b =>

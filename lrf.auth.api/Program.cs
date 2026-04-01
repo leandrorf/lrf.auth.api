@@ -1,4 +1,3 @@
-using System.Text;
 using lrf.auth.api.Authorization;
 using lrf.auth.api.Data;
 using lrf.auth.api.Domain.Permissions;
@@ -25,10 +24,9 @@ builder.Services.AddDbContext<AuthDbContext>(options =>
 
 var jwtOptions = builder.Configuration.GetSection(JwtOptions.SectionName).Get<JwtOptions>()
     ?? throw new InvalidOperationException("Seção Jwt é obrigatória.");
-if (string.IsNullOrWhiteSpace(jwtOptions.SigningKey) || jwtOptions.SigningKey.Length < 32)
-    throw new InvalidOperationException("Jwt:SigningKey deve ter pelo menos 32 caracteres.");
 
-var signingKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(jwtOptions.SigningKey));
+var oidcSigningKeyService = new OidcSigningKeyService();
+builder.Services.AddSingleton<IOidcSigningKeyService>(oidcSigningKeyService);
 
 builder.Services.AddAuthentication(options =>
     {
@@ -55,7 +53,7 @@ builder.Services.AddAuthentication(options =>
             ValidateAudience = true,
             ValidAudience = jwtOptions.Audience,
             ValidateIssuerSigningKey = true,
-            IssuerSigningKey = signingKey,
+            IssuerSigningKey = oidcSigningKeyService.SecurityKey,
             ValidateLifetime = true,
             ClockSkew = TimeSpan.FromMinutes(1),
         };
@@ -66,6 +64,7 @@ builder.Services.AddAuthorization(options => options.AddPermissionPolicies(UserM
 builder.Services.AddScoped<IJwtTokenService, JwtTokenService>();
 builder.Services.AddScoped<IAuthService, AuthService>();
 builder.Services.AddScoped<IOAuthConnectService, OAuthConnectService>();
+builder.Services.AddScoped<IConsentService, ConsentService>();
 
 builder.Services.AddControllers();
 builder.Services.AddRazorPages();

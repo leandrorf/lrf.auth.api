@@ -8,6 +8,7 @@ public interface IJwtTokenService
         User user,
         IReadOnlyCollection<string> groups,
         IReadOnlyCollection<string> permissions,
+        IReadOnlyCollection<string>? scopes = null,
         string? oauthClientId = null);
 
     (string Token, int ExpiresInSeconds) CreateIdToken(

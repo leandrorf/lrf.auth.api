@@ -82,4 +82,22 @@ public sealed class ConnectController : ControllerBase
         var outcome = await _oauth.ExchangeCodeAsync(form, cancellationToken);
         return StatusCode(outcome.StatusCode, outcome.Json);
     }
+
+    /// <summary>Revoga authorization code ou refresh token do cliente.</summary>
+    [HttpPost("revoke")]
+    [Consumes("application/x-www-form-urlencoded")]
+    public async Task<IActionResult> Revoke([FromForm] RevokeFormRequest form, CancellationToken cancellationToken)
+    {
+        await _oauth.RevokeAsync(form, cancellationToken);
+        return Ok();
+    }
+
+    /// <summary>Introspection endpoint para access_token e refresh_token.</summary>
+    [HttpPost("introspect")]
+    [Consumes("application/x-www-form-urlencoded")]
+    public async Task<IActionResult> Introspect([FromForm] IntrospectFormRequest form, CancellationToken cancellationToken)
+    {
+        var json = await _oauth.IntrospectAsync(form, cancellationToken);
+        return Ok(json);
+    }
 }

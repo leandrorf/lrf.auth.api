@@ -28,6 +28,10 @@ public sealed class AuthDbContext : DbContext
 
     public DbSet<OAuthAuthorizationCode> OAuthAuthorizationCodes => Set<OAuthAuthorizationCode>();
 
+    public DbSet<OAuthRefreshToken> OAuthRefreshTokens => Set<OAuthRefreshToken>();
+
+    public DbSet<UserOAuthConsent> UserOAuthConsents => Set<UserOAuthConsent>();
+
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
         modelBuilder.Entity<User>(b =>
@@ -105,6 +109,8 @@ public sealed class AuthDbContext : DbContext
             b.ToTable("oauth_clients");
             b.HasKey(x => x.ClientId);
             b.Property(x => x.ClientId).HasMaxLength(64).IsRequired();
+            b.Property(x => x.DisplayName).HasMaxLength(200).IsRequired();
+            b.Property(x => x.AllowedScopes).HasMaxLength(500).IsRequired();
         });
 
         modelBuilder.Entity<OAuthClientRedirectUri>(b =>
@@ -131,6 +137,25 @@ public sealed class AuthDbContext : DbContext
             b.Property(x => x.CodeChallengeMethod).HasMaxLength(10).IsRequired();
             b.Property(x => x.Scope).HasMaxLength(500).IsRequired();
             b.Property(x => x.Nonce).HasMaxLength(500);
+        });
+
+        modelBuilder.Entity<OAuthRefreshToken>(b =>
+        {
+            b.ToTable("oauth_refresh_tokens");
+            b.HasKey(x => x.Id);
+            b.HasIndex(x => x.TokenHash).IsUnique();
+            b.Property(x => x.TokenHash).HasMaxLength(64).IsRequired();
+            b.Property(x => x.ClientId).HasMaxLength(64).IsRequired();
+            b.Property(x => x.Scope).HasMaxLength(500).IsRequired();
+        });
+
+        modelBuilder.Entity<UserOAuthConsent>(b =>
+        {
+            b.ToTable("user_oauth_consents");
+            b.HasKey(x => x.Id);
+            b.HasIndex(x => new { x.UserId, x.ClientId, x.Scope }).IsUnique();
+            b.Property(x => x.ClientId).HasMaxLength(64).IsRequired();
+            b.Property(x => x.Scope).HasMaxLength(500).IsRequired();
         });
     }
 }
